@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Curve Clock</title>
+</head>
+<body>
+
+<canvas class="clock curve-clock-2"></canvas>
+
+<style type="text/css">
+	body {
+		margin: 0;
+	}
+
+	.curve-clock {
+		background: #fff;
+	}
+
+</style>
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script type="text/javascript">
+	(function() {
+		'use strict'
+
+		var width = 960, height = 500
+		var size = Math.min(width, height)
+		var radius = size * 0.4
+
+		var tau = Math.PI * 2
+
+		var r1 = Math.sqrt(0.9) * radius
+		var r2 = Math.sqrt(0.6) * radius
+		var r3 = Math.sqrt(0.3) * radius
+
+		var canvas = d3.select('.curve-clock-2')
+			.attr('width', width)
+			.attr('height', height)
+
+		var context = canvas.node().getContext("2d")
+
+		var line = d3.radialLine()
+			.context(context)
+
+		// context.clearRect(0, 0, width, height);
+		// context.fillStyle = "steelblue";
+		// context.beginPath();
+		// for (var i = 1; i < data.length; ++i) {
+		// 	var d = data[i];
+		// 	context.moveTo(d[0], d[1]);
+		// 	// context.arc(d[0], d[1], 10, 0, 2 * Math.PI);
+		// 	line(d)
+		// }
+		// context.stroke();
+		// context.fill();
+
+		function render(date) {
+			var ms = date.getMilliseconds() / 1000,
+				s = date.getSeconds() / 60,
+				m = date.getMinutes() / 60,
+				h = date.getHours() % 12 / 12
+
+			var data = [
+				[0, 0],
+				[tau * (s + ms / 60), r1],
+				[tau * (m + s / 60 + (ms / 6000)), r2],
+				[tau * (h + m / 12 + s / (12 * 60)), r3]
+			]
+
+			// console.log(data)
+			// context.clearRect(0, 0, width, height);
+
+			context.save()
+			// context.fillStyle = "#fff"
+			context.fillStyle = 'rgba(255,255,255,0.1)';
+			// context.globalAlpha = 0.0091
+			// context.fillStyle = "rgba(255,255,255,.05)"
+			context.fillRect(0, 0, width, height)
+			// context.clearRect(0, 0, width, height)
+			context.restore()
+
+
+			context.save()
+			context.translate(width/2, height/2)
+
+			context.beginPath();
+			// line(data)
+			// line.curve(d3.curveCatmullRomClosed.alpha(0))(data)
+			line.curve(d3.curveCatmullRomClosed.alpha(1))(data)
+
+			context.closePath()
+			context.stroke()
+			context.restore()
+
+			// console.log(line(data))
+			// curve1.datum(data).attr('d', line.curve(d3.curveCatmullRomClosed.alpha(0)))
+			// curve2.datum(data).attr('d', line.curve(d3.curveCatmullRomClosed.alpha(1)))
+			// curve3.datum(data).attr('d', line.curve(d3.curveCatmullRomClosed.alpha(1.5)))
+		}
+
+		function tick() {
+			var now = new Date()
+			// console.log(now)
+			d3.timeout(tick, 1000 - now % 1000)
+			render(now)
+		}
+
+		tick()
+
+		// d3.timer(tick)
+
+	})()
+</script>
+</body>
+</html>
